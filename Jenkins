@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'yourdockerhubusername/docker-gs-ping'
-        DOCKER_CREDENTIAL_ID = 'dockerhub' // Jenkins Docker Hub credential ID
+        DOCKER_CREDENTIAL_ID = 'dockerhub' // Jenkins credential ID
     }
 
     stages {
@@ -12,25 +12,27 @@ pipeline {
                 git 'https://github.com/yourusername/your-repo.git'
             }
         }
-tools{
-    git "github-token"
-}
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t $IMAGE_NAME ."
+                    sh "docker build -t ${IMAGE_NAME} ."
                 }
             }
         }
 
         stage('Login to Docker Hub & Push') {
             steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIAL_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                withCredentials([usernamePassword(
+                    credentialsId: "${DOCKER_CREDENTIAL_ID}",
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
                     script {
-                        sh '''
-                            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                            docker push $IMAGE_NAME           '''
+                        sh """
+                            echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+                            docker push ${IMAGE_NAME}
+                        """
                     }
                 }
             }
