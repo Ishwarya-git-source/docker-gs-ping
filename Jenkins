@@ -12,6 +12,8 @@ pipeline {
                 git 'https://github.com/yourusername/your-repo.git'
             }
         }
+tools{
+    git "github-token"
 
         stage('Build Docker Image') {
             steps {
